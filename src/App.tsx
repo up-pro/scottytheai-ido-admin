@@ -9,6 +9,7 @@ import { grey } from '@mui/material/colors';
 import Loading from './components/Loading'
 import Routes from './Routes'
 import { LoadingProvider } from './contexts/LoadingContext'
+import { ToastContainer } from 'react-toastify'
 
 //  --------------------------------------------------------------------------------------------------
 
@@ -57,6 +58,8 @@ export default function App() {
           </Suspense>
         </BrowserRouter>
       </WagmiConfig>
+      <Loading />
+      <ToastContainer />
       <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
     </ThemeProvider>
   )
