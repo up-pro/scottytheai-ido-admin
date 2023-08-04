@@ -14,7 +14,7 @@ export default function Routes() {
   return useRoutes([
     {
       path: '/',
-      element: <LandingLayout />,
+      element: address !== OWNER_WALLET ? <LandingLayout /> : <Navigate to="/dashboard/ido/sale-stage" />,
       children: [{
         path: '/',
         element: <WalletVerify />
@@ -34,10 +34,18 @@ export default function Routes() {
             {
               path: 'claim-status',
               element: <ClaimStatus />
+            },
+            {
+              path: '*',
+              element: <Navigate to="/dashboard/ido/sale-stage" replace />
             }
           ]
         }
       ]
     },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />
+    }
   ]);
 }

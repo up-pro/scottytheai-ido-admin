@@ -149,6 +149,13 @@ export default function EditDialog({ opened, setOpened, saleStage, closeDialog }
       setEndAt(dayjs(new Date(saleStage.end_at)))
     } else {
       formik.setValues(initialValues)
+      formik.setTouched({
+        name: false,
+        scottyPriceInUsd: false,
+        hardCap: false,
+        startAt: false,
+        endAt: false
+      })
     }
   }, [saleStage])
 
