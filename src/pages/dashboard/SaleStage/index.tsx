@@ -38,6 +38,7 @@ export default function SaleStage() {
   }
 
   useEffect(() => {
+    getAllSaleStages()
     const intervalId = setInterval(() => {
       getAllSaleStages()
     }, INTERVAL_TIME)
