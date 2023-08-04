@@ -9,10 +9,11 @@ import useLoading from '../../../hooks/useLoading'
 import api from '../../../utils/api'
 
 interface IProps {
-  saleStage: ISaleStage
+  saleStage: ISaleStage;
+  openDialogAsEdit: (saleStage: ISaleStage) => void;
 }
 
-export default function Row({ saleStage }: IProps) {
+export default function Row({ saleStage, openDialogAsEdit }: IProps) {
   const { openLoadingAct, closeLoadingAct } = useLoading()
 
   const status = useMemo<TStatus>(() => {
@@ -68,7 +69,7 @@ export default function Row({ saleStage }: IProps) {
       </TableCell>
       <TableCell>
         <ButtonGroup>
-          <Button>Edit</Button>
+          <Button onClick={() => openDialogAsEdit(saleStage)}>Edit</Button>
           <Button onClick={handleDelete}>Delete</Button>
         </ButtonGroup>
       </TableCell>

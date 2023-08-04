@@ -9,6 +9,7 @@ import EditDialog from './EditDialog'
 export default function SaleStage() {
   const [saleStages, setSaleStages] = useState<Array<ISaleStage>>([])
   const [dialogOpened, setDialogOpened] = useState<boolean>(false)
+  const [openedSaleStage, setOpenedSaleStage] = useState<ISaleStage | null>(null)
 
   const getAllSaleStages = () => {
     api.get('/ido/get-all-sale-stages')
@@ -19,6 +20,21 @@ export default function SaleStage() {
         const errorObject = JSON.parse(JSON.stringify(error))
         console.log('>>>>>>>>>>>>>>>> error of getAllSaleStages => ', errorObject)
       })
+  }
+
+  const openDialogAsEdit = (saleStage: ISaleStage) => {
+    setOpenedSaleStage(saleStage)
+    setDialogOpened(true)
+  }
+
+  const openDialogAsCreate = () => {
+    setOpenedSaleStage(null)
+    setDialogOpened(true)
+  }
+
+  const closeDialog = () => {
+    setOpenedSaleStage(null)
+    setDialogOpened(false)
   }
 
   useEffect(() => {
@@ -32,7 +48,7 @@ export default function SaleStage() {
     <Container maxWidth="xl">
       <Stack spacing={4}>
         <Stack direction="row" justifyContent="end">
-          <Button variant="contained" onClick={() => setDialogOpened(true)}>
+          <Button variant="contained" onClick={() => openDialogAsCreate()}>
             Create New
           </Button>
         </Stack>
@@ -54,7 +70,7 @@ export default function SaleStage() {
             </TableHead>
             <TableBody>
               {saleStages.map(saleStage => (
-                <Row key={saleStage.id} saleStage={saleStage} />
+                <Row key={saleStage.id} saleStage={saleStage} openDialogAsEdit={openDialogAsEdit} />
               ))}
             </TableBody>
           </Table>
@@ -63,6 +79,8 @@ export default function SaleStage() {
       <EditDialog
         opened={dialogOpened}
         setOpened={setDialogOpened}
+        saleStage={openedSaleStage}
+        closeDialog={closeDialog}
       />
     </Container>
   )

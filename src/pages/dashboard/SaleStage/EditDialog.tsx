@@ -1,10 +1,10 @@
-import { ChangeEvent, useState, useMemo } from 'react';
+import { ChangeEvent, useMemo, useEffect, useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, Box, Typography, Grid, TextField } from '@mui/material'
-import { Icon } from '@iconify/react'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { Icon } from '@iconify/react'
 import * as yup from 'yup';
 import { useFormik } from 'formik';
-import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { ISaleStage } from '../../../utils/interfaces';
 import { MSG_REQUIRED_FIELD, REGEX_NUMBER_VALID } from '../../../utils/constants';
@@ -16,10 +16,11 @@ import useLoading from '../../../hooks/useLoading';
 interface IProps {
   opened: boolean;
   setOpened: (value: boolean) => void;
-  saleStage?: ISaleStage;
+  saleStage: ISaleStage | null;
+  closeDialog: () => void;
 }
 
-interface IValues {
+interface IInitialValue {
   name: string;
   scottyPriceInUsd: string;
   hardCap: string;
@@ -29,6 +30,8 @@ interface IValues {
 
 //  -------------------------------------------------------------------------------------------------------
 
+const currentTimeInMs = new Date().getTime()
+
 const validationSchema = yup.object().shape({
   name: yup.string().required(MSG_REQUIRED_FIELD),
   scottyPriceInUsd: yup.string().required(MSG_REQUIRED_FIELD),
@@ -37,20 +40,21 @@ const validationSchema = yup.object().shape({
   endAt: yup.number().required(MSG_REQUIRED_FIELD),
 })
 
+const initialValues: IInitialValue = {
+  name: '',
+  scottyPriceInUsd: '',
+  hardCap: '',
+  startAt: currentTimeInMs,
+  endAt: currentTimeInMs + 24 * 3600 * 1000
+}
+
 //  -------------------------------------------------------------------------------------------------------
 
-export default function EditDialog({ opened, setOpened, saleStage }: IProps) {
+export default function EditDialog({ opened, setOpened, saleStage, closeDialog }: IProps) {
   const { openLoadingAct, closeLoadingAct } = useLoading()
 
-  const [startAtInDayJs, setStartAtInDayJs] = useState<string | null>()
-  const [endAtInDayJs, setEndAtInDayJs] = useState<string | null>()
-  const [initialValues, setInitialValues] = useState<IValues>({
-    name: '',
-    scottyPriceInUsd: '',
-    hardCap: '',
-    startAt: 0,
-    endAt: 0
-  })
+  const [startAt, setStartAt] = useState<Dayjs | null>(null)
+  const [endAt, setEndAt] = useState<Dayjs | null>(null)
 
   //  ----------------------------------------------------------------------------------
 
@@ -61,12 +65,22 @@ export default function EditDialog({ opened, setOpened, saleStage }: IProps) {
       console.log('>>>>>>>>>>> values => ', values)
       openLoadingAct()
       if (saleStage) {
-        console.log('>>>>>>>>>> hi')
+        api.put(`/ido/update-sale-stage/${saleStage.id}`, values)
+          .then(() => {
+            toast.success('Updated.')
+            closeLoadingAct()
+            closeDialog()
+          })
+          .catch(() => {
+            toast.error('Update failed.')
+            closeLoadingAct()
+          })
       } else {
         api.post('/ido/create-sale-stage', values)
           .then(() => {
             toast.success('Created.')
             closeLoadingAct()
+            closeDialog()
           })
           .catch(() => {
             toast.error('Creation failed.')
@@ -98,18 +112,6 @@ export default function EditDialog({ opened, setOpened, saleStage }: IProps) {
     }
   }
 
-  const handleStartAt = (newDateTime: string | null) => {
-    const startAtInMs = new Date(dayjs(newDateTime).format('YYYY-MM-DD HH:mm:ss:SSS')).getTime()
-    setStartAtInDayJs(newDateTime)
-    formik.setFieldValue('startAt', startAtInMs)
-  }
-
-  const handleEndAt = (newDateTime: string | null) => {
-    const endAtInMs = new Date(dayjs(newDateTime).format('YYYY-MM-DD HH:mm:ss:SSS')).getTime()
-    setEndAtInDayJs(newDateTime)
-    formik.setFieldValue('endAt', endAtInMs)
-  }
-
   //  ----------------------------------------------------------------------------------
 
   const scottyPriceInUsdInNumberType = useMemo<string>(() => {
@@ -134,8 +136,36 @@ export default function EditDialog({ opened, setOpened, saleStage }: IProps) {
 
   //  ----------------------------------------------------------------------------------
 
+  useEffect(() => {
+    if (saleStage) {
+      formik.setValues({
+        name: saleStage.name,
+        scottyPriceInUsd: saleStage.scotty_price_in_usd,
+        hardCap: saleStage.hard_cap,
+        startAt: saleStage.start_at,
+        endAt: saleStage.end_at
+      })
+      setStartAt(dayjs(new Date(saleStage.start_at)))
+      setEndAt(dayjs(new Date(saleStage.end_at)))
+    } else {
+      formik.setValues(initialValues)
+    }
+  }, [saleStage])
+
+  useEffect(() => {
+    const startAtInMs = new Date(dayjs(startAt).format('YYYY-MM-DD HH:mm:ss:SSS')).getTime()
+    formik.setFieldValue('startAt', startAtInMs)
+  }, [startAt])
+
+  useEffect(() => {
+    const endAtInMs = new Date(dayjs(endAt).format('YYYY-MM-DD HH:mm:ss:SSS')).getTime()
+    formik.setFieldValue('endAt', endAtInMs)
+  }, [endAt])
+
+  //  ----------------------------------------------------------------------------------
+
   return (
-    <Dialog open={opened} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={opened} onClose={closeDialog} maxWidth="sm" fullWidth>
       <DialogTitle
         display="flex"
         justifyContent="space-between"
@@ -199,8 +229,8 @@ export default function EditDialog({ opened, setOpened, saleStage }: IProps) {
               <DateTimePicker
                 label="Start at"
                 sx={{ width: '100%' }}
-                onChange={handleStartAt}
-                value={startAtInDayJs}
+                value={startAt}
+                onChange={(newValue) => setStartAt(newValue)}
               />
             </Grid>
             {/* End at */}
@@ -208,8 +238,8 @@ export default function EditDialog({ opened, setOpened, saleStage }: IProps) {
               <DateTimePicker
                 label="End at"
                 sx={{ width: '100%' }}
-                onChange={handleEndAt}
-                value={endAtInDayJs}
+                value={endAt}
+                onChange={(newValue) => setEndAt(newValue)}
               />
             </Grid>
           </Grid>
