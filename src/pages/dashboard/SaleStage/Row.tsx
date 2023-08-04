@@ -23,10 +23,10 @@ export default function Row({ saleStage, openDialogAsEdit }: IProps) {
   const handleStatus = (e: SelectChangeEvent) => {
     const newStatus = e.target.value;
     openLoadingAct()
-    api.put(`/ido/enable-sale-stage/${saleStage.id}`, { newStatus })
+    api.put(`/ido/update-status-of-sale-stage/${saleStage.id}`, { newStatus })
       .then(() => {
         closeLoadingAct()
-        toast.success('Enabled')
+        toast.success('Updated.')
       })
       .catch(error => {
         const errorObject = JSON.parse(JSON.stringify(error))

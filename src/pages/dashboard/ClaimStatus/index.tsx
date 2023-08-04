@@ -35,6 +35,7 @@ export default function ClaimStatus() {
   }
 
   useEffect(() => {
+    getClaimStatus()
     const intervalId = setInterval(() => {
       getClaimStatus()
     }, INTERVAL_TIME)
