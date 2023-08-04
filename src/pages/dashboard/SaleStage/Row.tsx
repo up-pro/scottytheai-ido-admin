@@ -21,7 +21,6 @@ export default function Row({ saleStage }: IProps) {
 
   const handleStatus = (e: SelectChangeEvent) => {
     const newStatus = e.target.value;
-    console.log('>>>>>>>>>>>> newStatus => ', newStatus)
     openLoadingAct()
     api.put(`/ido/enable-sale-stage/${saleStage.id}`, { newStatus })
       .then(() => {
@@ -31,6 +30,20 @@ export default function Row({ saleStage }: IProps) {
       .catch(error => {
         const errorObject = JSON.parse(JSON.stringify(error))
         console.log('>>>>>>>>>>>>>>>> error of getAllSaleStages => ', errorObject)
+        closeLoadingAct()
+      })
+  }
+
+  const handleDelete = () => {
+    openLoadingAct()
+    api.delete(`/ido/delete-sale-stage/${saleStage.id}`)
+      .then(() => {
+        closeLoadingAct()
+        toast.success('Deleted')
+      })
+      .catch(error => {
+        const errorObject = JSON.parse(JSON.stringify(error))
+        console.log('>>>>>>>>>>>>>>>> error of handleDelete => ', errorObject)
         closeLoadingAct()
       })
   }
@@ -56,7 +69,7 @@ export default function Row({ saleStage }: IProps) {
       <TableCell>
         <ButtonGroup>
           <Button>Edit</Button>
-          <Button>Delete</Button>
+          <Button onClick={handleDelete}>Delete</Button>
         </ButtonGroup>
       </TableCell>
     </TableRow >
