@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { TableRow, TableCell, Select, MenuItem } from '@mui/material'
+import { TableRow, TableCell, Select, MenuItem, ButtonGroup, Button } from '@mui/material'
 import { SelectChangeEvent } from '@mui/material/Select'
 import { toast } from 'react-toastify'
 import { ISaleStage } from '../../../utils/interfaces'
@@ -53,7 +53,12 @@ export default function Row({ saleStage }: IProps) {
           <MenuItem value="false">Disabled</MenuItem>
         </Select>
       </TableCell>
-      <TableCell></TableCell>
+      <TableCell>
+        <ButtonGroup>
+          <Button>Edit</Button>
+          <Button>Delete</Button>
+        </ButtonGroup>
+      </TableCell>
     </TableRow >
   )
 }

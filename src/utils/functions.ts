@@ -11,12 +11,5 @@ export const getVisibleDateTime = (datetime: Date): string => {
   const minutes = datetime.getMinutes();
   const seconds = datetime.getSeconds();
 
-  console.log(">>>>>>> year => ", year);
-  console.log(">>>>>>> month => ", month);
-  console.log(">>>>>>> date => ", date);
-  console.log(">>>>>>> hours => ", hours);
-  console.log(">>>>>>> minutes => ", minutes);
-  console.log(">>>>>>> seconds => ", seconds);
-
   return `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
 };

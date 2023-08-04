@@ -12,3 +12,5 @@ export const ROUTES = [
   }
 ];
 export const INTERVAL_TIME = 5000;
+export const MSG_REQUIRED_FIELD = "Required Field.";
+export const REGEX_NUMBER_VALID = /^[0-9]*\.?[0-9]*$/;

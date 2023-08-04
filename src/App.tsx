@@ -5,6 +5,8 @@ import { WagmiConfig, createConfig, mainnet } from 'wagmi'
 import { EthereumClient, w3mConnectors } from '@web3modal/ethereum'
 import { createPublicClient, http } from 'viem'
 import { grey } from '@mui/material/colors';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Loading from './components/Loading'
 import Routes from './Routes'
 import { LoadingProvider } from './contexts/LoadingContext'
@@ -50,9 +52,11 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <WagmiConfig config={wagmiConfig}>
         <BrowserRouter>
-          <LoadingProvider>
-            <Routes />
-          </LoadingProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LoadingProvider>
+              <Routes />
+            </LoadingProvider>
+          </LocalizationProvider>
         </BrowserRouter>
       </WagmiConfig>
       <Loading />
