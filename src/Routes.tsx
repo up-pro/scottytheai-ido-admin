@@ -2,7 +2,9 @@ import { Navigate, useRoutes } from "react-router";
 import { useAccount } from "wagmi";
 import DashboardLayout from "./layouts/DashboardLayout";
 import LandingLayout from "./layouts/LandingLayout";
-import WalletVerify from "./pages/WalletVerify";
+import WalletVerify from "./pages/landing/WalletVerify";
+import SaleStage from "./pages/dashboard/SaleStage";
+import ClaimStatus from "./pages/dashboard/ClaimStatus";
 
 const OWNER_WALLET = import.meta.env.VITE_OWNER_WALLET || ''
 
@@ -23,7 +25,17 @@ export default function Routes() {
       element: address === OWNER_WALLET ? <DashboardLayout /> : <Navigate to="/" replace />,
       children: [
         {
-
+          path: 'ido',
+          children: [
+            {
+              path: 'sale-stage',
+              element: <SaleStage />
+            },
+            {
+              path: 'claim-status',
+              element: <ClaimStatus />
+            }
+          ]
         }
       ]
     },

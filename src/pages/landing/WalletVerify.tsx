@@ -3,7 +3,7 @@ import { grey } from "@mui/material/colors"
 import { useWeb3Modal } from '@web3modal/react'
 import { Link } from "react-router-dom"
 import { useAccount, useDisconnect, useNetwork, useSwitchNetwork } from "wagmi"
-import { CHAIN_ID } from "../utils/constants"
+import { CHAIN_ID } from "../../utils/constants"
 
 const OWNER_WALLET = import.meta.env.VITE_OWNER_WALLET || ''
 

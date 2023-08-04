@@ -1,21 +1,10 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
-import MenuIcon from '@mui/icons-material/Menu';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import { Outlet } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { AppBar, Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography, Collapse } from '@mui/material';
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useDisconnect } from 'wagmi';
+import { Icon } from '@iconify/react';
+import { grey } from '@mui/material/colors';
+import { ROUTES } from '../../utils/constants';
 
 const drawerWidth = 240;
 
@@ -28,41 +17,62 @@ interface Props {
 }
 
 export default function DashboardLayout(props: Props) {
+  const { disconnect } = useDisconnect()
+  const { pathname } = useLocation()
+
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [idoNavLinksOpened, setIdoNavLinksOpened] = useState<boolean>(false)
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  const pageName = useMemo<string>(() => {
+    const routeData = ROUTES.find(route => route.path === pathname)
+    if (routeData) {
+      return routeData.label
+    }
+    return ''
+  }, [pathname])
 
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
       <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+        <ListItemButton onClick={() => setIdoNavLinksOpened(!idoNavLinksOpened)}>
+          <ListItemIcon>
+            <Box component={Icon} icon="fa-solid:donate" fontSize={18} />
+          </ListItemIcon>
+          <ListItemText primary="IDO" />
+          {idoNavLinksOpened ? (
+            <Box component={Icon} icon="iconamoon:arrow-down-2-bold" fontSize={18} />
+          ) : (
+            <Box component={Icon} icon="iconamoon:arrow-up-2-bold" fontSize={18} />
+          )}
+        </ListItemButton>
+        <Collapse in={idoNavLinksOpened} timeout="auto" unmountOnExit>
+          <List>
+            <ListItemButton sx={{ pl: 8 }} component={Link} to="/dashboard/ido/sale-stage">
+              <ListItemText primary="Sale Stage" />
             </ListItemButton>
-          </ListItem>
-        ))}
+            <ListItemButton sx={{ pl: 8 }} component={Link} to="/dashboard/ido/claim-status">
+              <ListItemText primary="Claim Status" />
+            </ListItemButton>
+          </List>
+        </Collapse>
       </List>
       <Divider />
       <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        <ListItem>
+          <ListItemButton onClick={() => disconnect?.()}>
+            <ListItemText primary="Disconnect" />
+            <ListItemIcon>
+              <Box component={Icon} icon="material-symbols:logout" color={grey[100]} fontSize={20} />
+            </ListItemIcon>
+          </ListItemButton>
+        </ListItem>
       </List>
     </div>
   );
@@ -87,10 +97,10 @@ export default function DashboardLayout(props: Props) {
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { sm: 'none' } }}
           >
-            <MenuIcon />
+            <Box component={Icon} icon="ri:menu-line" />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Responsive drawer
+            {pageName}
           </Typography>
         </Toolbar>
       </AppBar>

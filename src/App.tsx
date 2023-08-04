@@ -1,5 +1,4 @@
 import { ThemeProvider, createTheme } from '@mui/material'
-import { Suspense } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { Web3Modal } from '@web3modal/react'
 import { WagmiConfig, createConfig, mainnet } from 'wagmi'
@@ -51,11 +50,9 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <WagmiConfig config={wagmiConfig}>
         <BrowserRouter>
-          <Suspense fallback={<Loading />}>
-            <LoadingProvider>
-              <Routes />
-            </LoadingProvider>
-          </Suspense>
+          <LoadingProvider>
+            <Routes />
+          </LoadingProvider>
         </BrowserRouter>
       </WagmiConfig>
       <Loading />
