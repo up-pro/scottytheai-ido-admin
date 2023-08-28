@@ -1,16 +1,15 @@
 import { ThemeProvider, createTheme } from '@mui/material'
 import { BrowserRouter } from 'react-router-dom'
 import { Web3Modal } from '@web3modal/react'
-import { WagmiConfig, createConfig, mainnet } from 'wagmi'
-import { EthereumClient, w3mConnectors } from '@web3modal/ethereum'
-import { createPublicClient, http } from 'viem'
+import { WagmiConfig, configureChains, createConfig, mainnet } from 'wagmi'
+import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum'
 import { grey } from '@mui/material/colors';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { ToastContainer } from 'react-toastify'
 import Loading from './components/Loading'
 import Routes from './Routes'
 import { LoadingProvider } from './contexts/LoadingContext'
-import { ToastContainer } from 'react-toastify'
 
 //  --------------------------------------------------------------------------------------------------
 
@@ -35,13 +34,11 @@ const theme = createTheme({
 
 const projectId = import.meta.env.VITE_PROJECT_ID || ''
 const chains = [mainnet]
+const { publicClient } = configureChains(chains, [w3mProvider({ projectId })])
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: w3mConnectors({ projectId, chains }),
-  publicClient: createPublicClient({
-    chain: mainnet,
-    transport: http()
-  })
+  publicClient
 })
 const ethereumClient = new EthereumClient(wagmiConfig, chains)
 
